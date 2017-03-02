@@ -18,7 +18,6 @@ fn main(){
                                             .whitelisted_type("GraphChannel")
                                             .whitelisted_type("GraphVisual")
                                             .whitelisted_type("GraphWidget")
-                                            .opaque_type("std::string")
                                             .clang_arg("-x")
                                             .clang_arg("c++")
                                             .clang_arg("-std=c++11")
