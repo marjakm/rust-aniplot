@@ -1,0 +1,14 @@
+[package]
+name = "aniplot"
+version = "0.1.0"
+authors = ["Mattis Marjak <mattis.marjak@defendec.com>"]
+build = "build.rs"
+
+[dependencies]
+glium                = "0.16"
+imgui                = { git = "https://github.com/Gekkio/imgui-rs.git", rev="87b31d" }
+imgui-glium-renderer = { git = "https://github.com/Gekkio/imgui-rs.git", rev="87b31d" }
+
+[build-dependencies]
+gcc = "*"
+bindgen = "*"

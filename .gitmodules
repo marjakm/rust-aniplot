@@ -1,0 +1,3 @@
+[submodule "aniplot"]
+	path = aniplot
+	url = git@github.com:marjakm/aniplot.git
