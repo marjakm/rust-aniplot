@@ -7,7 +7,7 @@ fn main(){
     let aniplot_bindings = bindgen::Builder::default()
                                             .no_unstable_rust()
                                             .enable_cxx_namespaces()
-                                            .header("aniplot/aniplotlib.h")
+                                            .header("wrapper.h")
                                             .whitelisted_type("ImVec2")
                                             .whitelisted_type("ImVec4")
                                             .whitelisted_type("ImVec2d")
@@ -18,15 +18,18 @@ fn main(){
                                             .whitelisted_type("GraphChannel")
                                             .whitelisted_type("GraphVisual")
                                             .whitelisted_type("GraphWidget")
+                                            .whitelisted_type("TempContainer")
                                             .clang_arg("-x")
                                             .clang_arg("c++")
                                             .clang_arg("-std=c++11")
                                             .clang_arg("-Ianiplot/lib/imgui")
+                                            .clang_arg("-Ianiplot")
                                             .generate()
                                             .expect("Failed to generate aniplot bindings");
     aniplot_bindings.write_to_file("src/generated.rs")
                     .expect("Could not write aniplot bindings");
-    gcc::Config::new().file("aniplot/aniplotlib.cpp")
+    gcc::Config::new().file("wrapper.cpp")
+                      .include("aniplot")
                       .include("aniplot/lib/imgui")
                       .cpp(true)
                       .compile("libaniplot.a");

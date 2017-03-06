@@ -1,3 +1,6 @@
 [submodule "aniplot"]
 	path = aniplot
 	url = git@github.com:marjakm/aniplot.git
+[submodule "imgui-rs"]
+	path = imgui-rs
+	url = git@github.com:marjakm/imgui-rs.git

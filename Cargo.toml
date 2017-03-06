@@ -6,8 +6,8 @@ build = "build.rs"
 
 [dependencies]
 glium                = "0.16"
-imgui                = { git = "https://github.com/Gekkio/imgui-rs.git", rev="87b31d" }
-imgui-glium-renderer = { git = "https://github.com/Gekkio/imgui-rs.git", rev="87b31d" }
+imgui                = { path = "imgui-rs" }
+imgui-glium-renderer = { path = "imgui-rs/imgui-glium-renderer" }
 
 [build-dependencies]
 gcc = "*"
