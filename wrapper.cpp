@@ -1,9 +1,11 @@
 #include "aniplotlib.cpp"
 #include "wrapper.h"
+#include <cstdio>
 
-TempContainer::TempContainer() : graph_visual1_1(&graph_channel1_1) {}
+TempContainer::TempContainer() : graph_visual1_1(&graph_channel1_1) { }
 
 void TempContainer::init() {
+    graph_visual1_1.graph_channel = &graph_channel1_1; // HACK because stuff moves around
     graph_widget1.add_graph(&graph_visual1_1);
 
     graph_visual1_1.line_color = ImColor(1.0f, 1.0f, 0.8f);
@@ -12,8 +14,8 @@ void TempContainer::init() {
     graph_visual1_1.set_visual_valuespace_mapping(ImRect(0, -5, 10, 5));
 
     // visual guides that indicate min/max possible values
-    graph_channel1_1.value_min = -4;
-    graph_channel1_1.value_max = 4;
+    graph_channel1_1.value_min = -10;
+    graph_channel1_1.value_max = 10;
     str_replace(&graph_channel1_1.name, "line1");
     str_replace(&graph_channel1_1.unit, "m/s2");
 }
