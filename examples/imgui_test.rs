@@ -2,8 +2,8 @@
 extern crate aniplot;
 
 use imgui::*;
-use aniplot::TempContainer;
 use aniplot::imgui_support::Support;
+use aniplot::{Channel, Visual, draw_aniplot};
 
 
 const CLEAR_COLOR: (f32, f32, f32, f32) = (1.0, 1.0, 1.0, 1.0);
@@ -11,11 +11,16 @@ const CLEAR_COLOR: (f32, f32, f32, f32) = (1.0, 1.0, 1.0, 1.0);
 
 fn main() {
     let mut support = Support::init();
-    let mut tmp = unsafe { TempContainer::new() };
-    unsafe { tmp.init() };
+    let mut channel1_1 = Channel::new();
+    let mut visual1_1 = Visual::new();
+    let mut t: f64 = 0.;
+    let dt: f64 = 1./60.;
+
 
     loop {
-        support.render(CLEAR_COLOR, |ui| hello_world(ui, &mut tmp));
+        t += dt;
+        channel1_1.append_sample( (t.sin() * (t*1.3).sin() + (t*4.3).sin()) as f32 );
+        support.render(CLEAR_COLOR, |ui| hello_world(ui, &mut channel1_1, &visual1_1));
         let active = support.update_events();
         if !active {
             break;
@@ -23,12 +28,11 @@ fn main() {
     }
 }
 
-fn hello_world<'a>(ui: &Ui<'a>, tmp: &mut TempContainer) {
+fn hello_world<'a>(ui: &Ui<'a>, channel1_1: &mut Channel, visual1_1: &Visual) {
     ui.window(im_str!("Hello world"))
         .size((300.0, 100.0), ImGuiSetCond_FirstUseEver)
         .build(|| {
-            unsafe { tmp.append_samples() };
-            unsafe { tmp.do_graph() };
+            draw_aniplot(channel1_1, visual1_1, im_str!("robota-1"), Some(ImVec2::new(0., 200.)));
             ui.text(im_str!("Hello world!"));
             ui.text(im_str!("This...is...imgui-rs!"));
             if ui.button(im_str!("Tere"), ImVec2::new(100.,50.)) {

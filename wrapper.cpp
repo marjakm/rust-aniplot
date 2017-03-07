@@ -33,3 +33,12 @@ void TempContainer::do_graph() {
     float graph_h = 200;
     graph_widget1.DoGraph("robota-1", ImVec2(graph_w, graph_h));
 }
+
+/////////// REAL STUFF ////////////////////////
+
+
+GraphChannel GraphChannel_GraphChannel() { return GraphChannel(); }
+void GraphChannel_append_sample(GraphChannel *t, float v) { t->append_sample(v); }
+void GraphChannel_append_sample_minmaxavg(GraphChannel *t, float min, float max, float avg) { t->append_sample_minmaxavg(min, max, avg); }
+
+GraphVisual GraphVisual_GraphVisual() { return GraphVisual((GraphChannel*)1); }
