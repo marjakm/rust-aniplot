@@ -1,20 +1,6 @@
 #include "aniplotlib.h"
 
 
-struct TempContainer {
-    GraphWidget graph_widget1;
-    GraphChannel graph_channel1_1;
-    GraphVisual graph_visual1_1;
-
-    TempContainer();
-    void init();
-    void append_samples();
-    void do_graph();
-};
-
-
-/////////// REAL STUFF ////////////////////////
-
 GraphChannel GraphChannel_GraphChannel();
 void GraphChannel_delGraphChannel(GraphChannel *t);
 void GraphChannel_append_sample(GraphChannel *t, float v);

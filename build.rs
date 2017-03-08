@@ -18,7 +18,6 @@ fn main(){
                                             .whitelisted_type("GraphChannel")
                                             .whitelisted_type("GraphVisual")
                                             .whitelisted_type("GraphWidget")
-                                            .whitelisted_type("TempContainer")
                                             .whitelisted_function("GraphChannel_GraphChannel")
                                             .whitelisted_function("GraphChannel_append_sample")
                                             .whitelisted_function("GraphChannel_append_sample_minmaxavg")
