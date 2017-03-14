@@ -6,7 +6,9 @@ extern crate imgui_glium_renderer;
 mod generated;
 pub mod imgui_support { include!("../imgui-rs/examples/support/mod.rs"); }
 
-use std::borrow::Borrow;
+use std::borrow::{Borrow, BorrowMut};
+use std::ffi::CStr;
+use std::str::Utf8Error;
 
 
 pub struct Channel {
@@ -40,9 +42,26 @@ impl Channel {
         self
     }
 
+    pub fn get_name(&self) -> Result<&str, Utf8Error> {
+        unsafe { CStr::from_ptr(self.inner.name) }.to_str()
+    }
+
     pub fn set_unit(&mut self, unit: imgui::ImStr) -> &mut Self {
         unsafe { ::generated::root::noinline_str_replace(&mut self.inner.unit, unit.as_ptr()); }
         self
+    }
+
+    // Converts sample values to graph values
+    // ss - samplespace
+    // gs - graphspace
+    //      gs    ss    gs    ss
+    // X    0.0 = x0    1.0 = x1
+    // Y    0.0 = y0    1.0 = y1
+    pub fn set_value_samplespace_mapping(&mut self, x0: f64, y0: f64, x1: f64, y1: f64) {
+        self.inner.portal.min.x = x0;
+        self.inner.portal.min.y = y0;
+        self.inner.portal.max.x = x1;
+        self.inner.portal.max.y = y1;
     }
 
     pub fn set_value_limits(&mut self, min: f32, max: f32) -> &mut Self {
@@ -71,6 +90,7 @@ impl Drop for Channel {
 pub struct Visual {
     pub line_color: imgui::ImVec4,
     pub line_width: f32,
+    pub visible: bool,
 }
 
 impl Visual {
@@ -78,6 +98,7 @@ impl Visual {
         Visual {
             line_color: imgui::ImVec4::new(0.8, 0.8, 0.8, 1.0),
             line_width: 1.,
+            visible: true,
         }
     }
 
@@ -85,6 +106,7 @@ impl Visual {
         Visual {
             line_color: imgui::ImVec4::new(r,g,b,a),
             line_width: 1.,
+            visible: true,
         }
     }
 
@@ -92,13 +114,19 @@ impl Visual {
         Visual {
             line_color: imgui::ImVec4::new(r,g,b,a),
             line_width: width,
+            visible: true,
         }
     }
 
     fn patch_graph_visual(&self, channel: &Channel, vis: &mut ::generated::root::GraphVisual) {
         vis.line_color = self.line_color.into();
         vis.line_width = self.line_width;
+        vis.visible = self.visible;
         vis.graph_channel = unsafe { ::std::mem::transmute::<_, *mut _>(channel)  };
+    }
+
+    fn after_draw(&mut self, vis: &::generated::root::GraphVisual) {
+        self.visible = vis.visible;
     }
 }
 
@@ -113,13 +141,26 @@ impl Widget {
         }
     }
 
-    pub fn draw(&mut self, label: imgui::ImStr, size: Option<imgui::ImVec2>, drawables: &[&Drawable]) {
+    pub fn with_area(x0: f64, y0: f64, x1: f64, y1: f64) -> Self {
+        let mut s = Self::new();
+        s.set_visible_area(x0, y0, x1, y1);
+        s
+    }
+
+    pub fn set_visible_area(&mut self, x0: f64, y0: f64, x1: f64, y1: f64) {
+        self.visual.portal.min.x = x0;
+        self.visual.portal.min.y = y0;
+        self.visual.portal.max.x = x1;
+        self.visual.portal.max.y = y1;
+    }
+
+    pub fn draw(&mut self, label: imgui::ImStr, size: Option<imgui::ImVec2>, drawables: &mut[&mut Drawable]) {
         let final_size = match size {
             Some(s) => s,
             None => imgui::ImVec2::new(0., 0.)
         };
         let mut tmp_visuals = Vec::with_capacity(drawables.len());
-        for d in drawables {
+        for d in drawables.iter() {
             let mut vis = self.visual.clone();
             d.drawable(&mut vis);
             tmp_visuals.push(vis);
@@ -132,28 +173,41 @@ impl Widget {
             graph_widget.DoGraph(label.as_ptr(), final_size.into());
             ::generated::root::GraphWidget_delGraphWidget(&mut graph_widget);
         }
-        if let Some(v) = tmp_visuals.into_iter().next() {
-            self.visual = v;
+        for (i,(v, d)) in tmp_visuals.into_iter().zip(drawables).enumerate() {
+            d.after_draw(&v);
+            if i == 0 {
+                self.visual = v;
+            }
         }
     }
 }
 
 pub trait Drawable {
     fn drawable(&self, vis: &mut ::generated::root::GraphVisual);
+    fn after_draw(&mut self, vis: &::generated::root::GraphVisual);
 }
 
-impl<C: Borrow<Channel>, V: Borrow<Visual>> Drawable for (C, V) {
+impl<C: Borrow<Channel>, V: BorrowMut<Visual>> Drawable for (C, V) {
     fn drawable(&self, vis: &mut ::generated::root::GraphVisual) {
         self.1.borrow().patch_graph_visual(self.0.borrow(), vis);
     }
+    fn after_draw(&mut self, vis: &::generated::root::GraphVisual) {
+        self.1.borrow_mut().after_draw(vis);
+    }
 }
 
-impl<C: Borrow<Channel>> Drawable for C {
+impl<C: BorrowMut<Channel>> Drawable for C {
     fn drawable(&self, vis: &mut ::generated::root::GraphVisual) {
         let bs = self.borrow();
         match bs.visual {
             Some(ref v) => v.patch_graph_visual(bs, vis),
             None => Visual::new().patch_graph_visual(bs, vis),
+        }
+    }
+    fn after_draw(&mut self, vis: &::generated::root::GraphVisual) {
+        match self.borrow_mut().visual {
+            Some(ref mut v) => v.after_draw(vis),
+            None => {}
         }
     }
 }

@@ -42,8 +42,8 @@ fn main() {
             ui.window(im_str!("Hello world"))
                 .size((300.0, 100.0), ImGuiSetCond_FirstUseEver)
                 .build(|| {
-                    widget1.draw(im_str!("robota-1"), Some(ImVec2::new(0., 200.)), &[ &(&channel1_1, &visual1_1), &channel1_2 ]);
-                    widget2.draw(im_str!("robota-2"), Some(ImVec2::new(0., 200.)), &[&channel2_1]);
+                    widget1.draw(im_str!("robota-1"), Some(ImVec2::new(0., 200.)), &mut [ &mut (&mut channel1_1, &mut visual1_1), &mut channel1_2 ]);
+                    widget2.draw(im_str!("robota-2"), Some(ImVec2::new(0., 200.)), &mut [&mut channel2_1]);
                     ui.separator();
                     let mouse_pos = ui.imgui().mouse_pos();
                     ui.text(im_str!("Mouse Position: ({:.1},{:.1})", mouse_pos.0, mouse_pos.1));
