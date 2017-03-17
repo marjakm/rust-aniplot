@@ -38,5 +38,6 @@ fn main(){
                       .include("aniplot")
                       .include("imgui-rs/imgui-sys/third-party/cimgui/imgui")
                       .cpp(true)
+                      .flag("-std=c++11")
                       .compile("libaniplot.a");
 }
