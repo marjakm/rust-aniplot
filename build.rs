@@ -28,7 +28,7 @@ fn main(){
                                             .clang_arg("-x")
                                             .clang_arg("c++")
                                             .clang_arg("-std=c++11")
-                                            .clang_arg("-Ianiplot/lib/imgui")
+                                            .clang_arg("-Iimgui-rs/imgui-sys/third-party/cimgui/imgui")
                                             .clang_arg("-Ianiplot")
                                             .generate()
                                             .expect("Failed to generate aniplot bindings");
@@ -36,7 +36,7 @@ fn main(){
                     .expect("Could not write aniplot bindings");
     gcc::Config::new().file("wrapper.cpp")
                       .include("aniplot")
-                      .include("aniplot/lib/imgui")
+                      .include("imgui-rs/imgui-sys/third-party/cimgui/imgui")
                       .cpp(true)
                       .compile("libaniplot.a");
 }
