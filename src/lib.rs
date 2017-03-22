@@ -141,17 +141,18 @@ impl Widget {
         }
     }
 
-    pub fn with_area(x0: f64, y0: f64, x1: f64, y1: f64) -> Self {
+    pub fn with_area(x0: f64, y0: f64, x1: f64, y1: f64, anchored: bool) -> Self {
         let mut s = Self::new();
-        s.set_visible_area(x0, y0, x1, y1);
+        s.set_visible_area(x0, y0, x1, y1, anchored);
         s
     }
 
-    pub fn set_visible_area(&mut self, x0: f64, y0: f64, x1: f64, y1: f64) {
+    pub fn set_visible_area(&mut self, x0: f64, y0: f64, x1: f64, y1: f64, anchored: bool) {
         self.visual.portal.min.x = x0;
         self.visual.portal.min.y = y0;
         self.visual.portal.max.x = x1;
         self.visual.portal.max.y = y1;
+        self.visual.anchored = anchored;
     }
 
     pub fn set_visible_area_from_widget(&mut self, w: &Widget) {
@@ -159,6 +160,7 @@ impl Widget {
         self.visual.portal.min.y = w.visual.portal.min.y;
         self.visual.portal.max.x = w.visual.portal.max.x;
         self.visual.portal.max.y = w.visual.portal.max.y;
+        self.visual.anchored = w.visual.anchored;
     }
 
     pub fn draw(&mut self, label: imgui::ImStr, size: Option<imgui::ImVec2>, drawables: &mut[&mut Drawable]) {
