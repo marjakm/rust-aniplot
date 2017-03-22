@@ -154,6 +154,13 @@ impl Widget {
         self.visual.portal.max.y = y1;
     }
 
+    pub fn set_visible_area_from_widget(&mut self, w: &Widget) {
+        self.visual.portal.min.x = w.visual.portal.min.x;
+        self.visual.portal.min.y = w.visual.portal.min.y;
+        self.visual.portal.max.x = w.visual.portal.max.x;
+        self.visual.portal.max.y = w.visual.portal.max.y;
+    }
+
     pub fn draw(&mut self, label: imgui::ImStr, size: Option<imgui::ImVec2>, drawables: &mut[&mut Drawable]) {
         let final_size = match size {
             Some(s) => s,
