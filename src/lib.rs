@@ -1,10 +1,13 @@
+extern crate gfx;
+extern crate gfx_window_glutin;
+extern crate glutin;
 extern crate imgui;
-extern crate glium;
-extern crate imgui_glium_renderer;
+extern crate imgui_sys;
+extern crate imgui_gfx_renderer;
 
 #[allow(dead_code, non_snake_case, non_camel_case_types, improper_ctypes)]
 mod generated;
-pub mod imgui_support { include!("../imgui-rs/examples/support/mod.rs"); }
+pub mod support_gfx { include!("../imgui-rs/imgui-examples/examples/support_gfx/mod.rs"); }
 
 use std::borrow::{Borrow, BorrowMut};
 use std::ffi::CStr;
@@ -19,35 +22,39 @@ pub struct Channel {
 impl Channel {
     pub fn new() -> Self {
         Channel {
-            inner: unsafe { ::generated::root::GraphChannel_GraphChannel() },
+            inner: unsafe { ::generated::root::GraphChannel::new() },
             visual: None,
         }
     }
 
-    pub fn with_name(name: imgui::ImStr) -> Self {
+    pub fn with_name(name: &imgui::ImStr) -> Self {
         let mut s = Self::new();
         s.set_name(name);
         s
     }
 
-    pub fn with_name_and_unit(name: imgui::ImStr, unit: imgui::ImStr) -> Self {
+    pub fn with_name_and_unit(name: &imgui::ImStr, unit: &imgui::ImStr) -> Self {
         let mut s = Self::new();
         s.set_name(name);
         s.set_unit(unit);
         s
     }
 
-    pub fn set_name(&mut self, name: imgui::ImStr) -> &mut Self {
-        unsafe { ::generated::root::noinline_str_replace(&mut self.inner.name, name.as_ptr()); }
+    pub fn set_name(&mut self, name: &imgui::ImStr) -> &mut Self {
+        // TODO: fix
+        unsafe { ::generated::root::assign_to_cpp_string(&mut self.inner.name, name.as_ptr()); }
         self
     }
 
     pub fn get_name(&self) -> Result<&str, Utf8Error> {
-        unsafe { CStr::from_ptr(self.inner.name) }.to_str()
+        // TODO: fix
+        let val = unsafe { ::generated::root::get_cpp_string_value(&self.inner.name) };
+        unsafe { CStr::from_ptr(val) }.to_str()
     }
 
-    pub fn set_unit(&mut self, unit: imgui::ImStr) -> &mut Self {
-        unsafe { ::generated::root::noinline_str_replace(&mut self.inner.unit, unit.as_ptr()); }
+    pub fn set_unit(&mut self, unit: &imgui::ImStr) -> &mut Self {
+        // TODO: fix
+        unsafe { ::generated::root::assign_to_cpp_string(&mut self.inner.unit, unit.as_ptr()); }
         self
     }
 
@@ -137,7 +144,7 @@ pub struct Widget {
 impl Widget {
     pub fn new() -> Self {
         Widget {
-            visual: unsafe { ::generated::root::GraphVisual_GraphVisual() }
+            visual: unsafe { ::generated::root::GraphVisual::new(*&1 as _, 0) }
         }
     }
 
@@ -163,7 +170,7 @@ impl Widget {
         self.visual.anchored = w.visual.anchored;
     }
 
-    pub fn draw(&mut self, label: imgui::ImStr, size: Option<imgui::ImVec2>, drawables: &mut[&mut Drawable]) {
+    pub fn draw(&mut self, label: &imgui::ImStr, size: Option<imgui::ImVec2>, drawables: &mut[&mut Drawable]) {
         let final_size = match size {
             Some(s) => s,
             None => imgui::ImVec2::new(0., 0.)
