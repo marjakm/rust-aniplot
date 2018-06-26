@@ -6,7 +6,7 @@ extern crate imgui_sys;
 extern crate imgui_gfx_renderer;
 
 #[allow(dead_code, non_snake_case, non_camel_case_types, improper_ctypes)]
-mod generated;
+mod generated { include!(concat!(env!("OUT_DIR"), "/generated.rs")); }
 pub mod support_gfx { include!("../imgui-rs/imgui-examples/examples/support_gfx/mod.rs"); }
 
 use std::borrow::{Borrow, BorrowMut};
